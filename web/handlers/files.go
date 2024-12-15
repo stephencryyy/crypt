@@ -16,8 +16,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	chatpb "github.com/stephencryyy/cryptokurs/proto/chatpb"
-	"github.com/stephencryyy/cryptokurs/web/grpcclient"
+	chatpb "github.com/stephencryyy/crypt/proto/chatpb"
+	"github.com/stephencryyy/crypt/web/grpcclient"
 	_ "github.com/lib/pq"
 )
 

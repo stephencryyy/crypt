@@ -12,9 +12,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stephencryyy/cryptokurs/algorithm" // Импорт пакета algorithm
-	chatpb "github.com/stephencryyy/cryptokurs/proto/chatpb"
-	"github.com/stephencryyy/cryptokurs/web/grpcclient"
+	"github.com/stephencryyy/crypt/algorithm" // Импорт пакета algorithm
+	chatpb "github.com/stephencryyy/crypt/proto/chatpb"
+	"github.com/stephencryyy/crypt/web/grpcclient"
 )
 
 func ShowCreateChatPage(c *gin.Context) {

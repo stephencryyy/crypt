@@ -15,7 +15,7 @@ import (
 	"sync"
 
 	"github.com/joho/godotenv"
-	"github.com/stephencryyy/cryptokurs/algorithm"
+	"github.com/stephencryyy/crypt/algorithm"
 )
 
 // SECRET_KEY используется для шифрования приватных ключей пользователей.

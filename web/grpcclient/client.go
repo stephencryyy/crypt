@@ -3,7 +3,7 @@ package grpcclient
 import (
 	"log"
 
-	chatpb "github.com/stephencryyy/cryptokurs/proto/chatpb"
+	chatpb "github.com/stephencryyy/crypt/proto/chatpb"
 	"google.golang.org/grpc"
 )
 

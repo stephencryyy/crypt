@@ -10,7 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	chatpb "github.com/stephencryyy/cryptokurs/proto/chatpb"
+	chatpb "github.com/stephencryyy/crypt/proto/chatpb"
 	"google.golang.org/grpc"
 )
 

@@ -1,4 +1,4 @@
-module github.com/stephencryyy/cryptokurs
+module github.com/stephencryyy/crypt
 
 go 1.22
 

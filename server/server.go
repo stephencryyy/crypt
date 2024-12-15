@@ -18,7 +18,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	chatpb "./proto/chatpb"
+	chatpb "github.com/stephencryyy/crypt/proto/chatpb"
 )
 
 // Структура клиента

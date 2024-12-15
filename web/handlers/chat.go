@@ -12,9 +12,9 @@ import (
 	"math/big"
 	"net/http"
 
-	"github.com/stephencryyy/cryptokurs/algorithm"
-	chatpb "github.com/stephencryyy/cryptokurs/proto/chatpb"
-	"github.com/stephencryyy/cryptokurs/web/grpcclient"
+	"github.com/stephencryyy/crypt/algorithm"
+	chatpb "github.com/stephencryyy/crypt/proto/chatpb"
+	"github.com/stephencryyy/crypt/web/grpcclient"
 
 	"github.com/gin-gonic/gin"
 )

@@ -16,8 +16,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	"crypt/algorithm"
-	chatpb "crypt/proto/chatpb"
+	"github.com/stephencryyy/crypt/algorithm"
+	chatpb "github.com/stephencryyy/crypt/proto/chatpb"
 
 	"github.com/google/uuid"
 )

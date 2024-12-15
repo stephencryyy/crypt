@@ -6,9 +6,9 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stephencryyy/cryptokurs/web/grpcclient"
-	"github.com/stephencryyy/cryptokurs/web/handlers"
-	"github.com/stephencryyy/cryptokurs/web/middleware"
+	"github.com/stephencryyy/crypt/web/grpcclient"
+	"github.com/stephencryyy/crypt/web/handlers"
+	"github.com/stephencryyy/crypt/web/middleware"
 )
 
 func main() {
