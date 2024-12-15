@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Вход - Secret Chat</title>
+    <style>
+        body {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            color: #ecf0f1;
+        }
+        form {
+            background-color: #34495e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #3498db;
+            color: #ffffff;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        a {
+            color: #1abc9c;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <form id="login-form" action="/login" method="post">
+        <h1>Вход</h1>
+        <div id="message">
+            {{if .success}}
+                <p style="color: green;">{{.success}}</p>
+            {{end}}
+            {{if .error}}
+                <p style="color: red;">{{.error}}</p>
+            {{end}}
+        </div>
+        <label for="username">Имя пользователя:</label>
+        <input type="text" name="username" id="username" required>
+
+        <label for="password">Пароль:</label>
+        <input type="password" name="password" id="password" required>
+
+        <button type="submit">Войти</button>
+        <p>Нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+    </form>
+</body>
+</html>

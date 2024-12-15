@@ -1,0 +1,75 @@
+<!-- web/templates/landing.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная страница</title>
+    <style>
+        /* Глобальные стили */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #2980b9, #6dd5fa, #ffffff);
+            background-size: 600% 600%;
+            animation: gradientAnimation 15s ease infinite;
+        }
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .container {
+            text-align: center;
+            background-color: rgba(44, 62, 80, 0.8);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #ecf0f1;
+            margin-bottom: 30px;
+            font-size: 48px;
+        }
+        /* Стили для кнопок-ссылок */
+        .login-link,
+        .register-link {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px 30px;
+            text-decoration: none;
+            color: #ffffff;
+            border-radius: 50px;
+            transition: background-color 0.3s ease, transform 0.2s;
+            font-size: 18px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .login-link {
+            background-color: #e67e22;
+            border: 1px solid #d35400;
+        }
+        .register-link {
+            background-color: #1abc9c;
+            border: 1px solid #16a085;
+        }
+        .login-link:hover,
+        .register-link:hover {
+            background-color: #ffffff;
+            color: #2c3e50;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Добро пожаловать!</h1>
+        <a href="/login" class="login-link">Войти</a>
+        <a href="/register" class="register-link">Зарегистрироваться</a>
+    </div>
+</body>
+</html>

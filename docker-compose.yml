@@ -1,0 +1,62 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:14
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+#    healthcheck:
+#      test: ["CMD-SHELL", "pg_isready -U user -d mydb"]
+#      interval: 5s
+#      timeout: 5s
+#      retries: 5
+
+  redis:
+    image: redis:6
+    container_name: redis-container
+    ports:
+      - "6379:6379"
+#    healthcheck:
+#      test: ["CMD", "redis-cli", "ping"]
+#      interval: 5s
+#      timeout: 5s
+#      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+#    healthcheck:
+#      test: ["CMD", "rabbitmqctl", "status"]
+#      interval: 5s
+#      timeout: 5s
+#      retries: 5
+
+  server:
+    build:
+      context: .
+      dockerfile: ./server/Dockerfile
+    container_name: chat-server
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    environment:
+    # Переменные окружения для подключения к сервисам
+    # Если вы хотите передать их внутрь приложения:
+     - POSTGRES_DSN=postgres://user:password@postgres:5432/postgres?sslmode=disable
+     - REDIS_ADDR=redis:6379
+     - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+    ports:
+      - "50051:50051"
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:50051"] # Если есть HTTP endpoint для проверки или заменить на grpc_health_probe
+#      interval: 10s
+#      timeout: 5s
+#      retries: 3

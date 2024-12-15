@@ -1,0 +1,106 @@
+<!-- web/templates/create_chat.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Создать чат</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="/static/js/app.js" defer></script>
+    <style>
+        body {
+            background-color: #ecf0f1; /* Светлый фон */
+            color: #2c3e50; /* Темный текст */
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        a {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #2ecc71;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #27ae60;
+        }
+        .error-message {
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Создание новой чат-комнаты</h1>
+
+    <!-- Кнопка выхода -->
+    <a href="/messi/hub">Выйти</a>
+
+    <!-- Отображение ошибок -->
+    <div id="chat-message">
+        {{if .error}}
+            <p class="error-message">{{.error}}</p>
+        {{end}}
+    </div>
+
+    <!-- Форма создания комнаты -->
+    <h2>Создать чат-комнату</h2>
+    <form id="create-chat-form" action="/messi/create_chat" method="post">
+        <label for="algorithm">Алгоритм:</label>
+        <select name="algorithm" id="algorithm" required>
+            <option value="rc5">RC5</option>
+        </select>
+
+        <label for="mode">Режим:</label>
+        <select name="mode" id="mode" required>
+            <option value="ECB">ECB</option>
+            <option value="CBC">CBC</option>
+            <option value="CFB">CFB</option>
+            <option value="OFB">OFB</option>
+            <option value="CTR">CTR</option>
+            <option value="RandomDelta">Random Delta</option>
+        </select>
+
+        <label for="padding">Набивка:</label>
+        <select name="padding" id="padding" required>
+            <option value="Zeros">Zeros</option>
+            <option value="ANSIX923">ANSIX923</option>
+            <option value="PKCS7">PKCS7</option>
+            <option value="ISO10126">ISO10126</option>
+        </select>
+
+        <!-- Новое поле для имени пользователя для приглашения -->
+        <label for="invitee_username">Имя пользователя для приглашения:</label>
+        <input type="text" name="invitee_username" id="invitee_username" required>
+
+        <button type="submit">Создать комнату</button>
+    </form>
+</body>
+</html>

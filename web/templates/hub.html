@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Меню чатов</title>
+    <!-- Подключение Bootstrap CSS для стилизации (опционально) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Ваши стили */
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Добро пожаловать, {{.username}}</h1>
+
+        <h2>Ваши чаты</h2>
+        <ul>
+            {{range .chats}}
+                <li><a href="/messi/chat?room_id={{.RoomID}}">{{.ChatName}}</a></li>
+            {{else}}
+                <li>Нет чатов.</li>
+            {{end}}
+        </ul>
+
+        <!-- Кнопка для создания чата -->
+        <a href="/messi/create_chat">
+            <button class="btn btn-primary">Создать новый чат</button>
+        </a>
+
+        <h2>Приглашения</h2>
+        <div id="invitations-container">
+            {{range .invitations}}
+                <div class="alert alert-info">
+                    <strong>Комната:</strong> {{.ChatName}} (ID: {{.ChatID}}), <strong>От:</strong> {{.InviterUsername}}
+                    <button class="btn btn-success btn-sm ml-2 accept-invitation" data-id="{{.ID}}">Принять</button>
+                    <button class="btn btn-danger btn-sm ml-2 decline-invitation" data-id="{{.ID}}">Отклонить</button>
+                </div>
+            {{else}}
+                <p>Нет приглашений.</p>
+            {{end}}
+        </div>
+        <button onclick="loadInvitations()" class="btn btn-secondary mt-2">Обновить приглашения</button>
+
+        <!-- Notification Container -->
+        <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 10px; right: 10px; min-width: 300px;">
+            <div id="notification-container" style="position: absolute; top: 0; right: 0;"></div>
+        </div>
+
+        <a href="/messi/logout" class="btn btn-danger mt-3">Выйти из профиля</a>
+    </div>
+
+    <!-- Подключение jQuery и Bootstrap JS для обработки AJAX и уведомлений -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            // Функция для загрузки приглашений
+            function loadInvitations() {
+                $.ajax({
+                    url: '/messi/invitations',
+                    type: 'GET',
+                    success: function(data) {
+                        const container = $('#invitations-container');
+                        container.empty(); // Очищаем существующие приглашения
+
+                        if (data.invitations.length === 0) {
+                            container.append('<p>Нет приглашений.</p>');
+                            return;
+                        }
+
+                        data.invitations.forEach(inv => {
+                            const invitationDiv = $(`
+                                <div class="alert alert-info">
+                                    <strong>Комната:</strong> ${inv.chat_name} (ID: ${inv.chat_id}), <strong>От:</strong> ${inv.inviter_username}
+                                    <button class="btn btn-success btn-sm ml-2 accept-invitation" data-id="${inv.id}">Принять</button>
+                                    <button class="btn btn-danger btn-sm ml-2 decline-invitation" data-id="${inv.id}">Отклонить</button>
+                                </div>
+                            `);
+                            container.append(invitationDiv);
+                        });
+                    },
+                    error: function(xhr) {
+                        console.error('Error fetching invitations:', xhr);
+                        showNotification('Ошибка', 'Не удалось загрузить приглашения');
+                    }
+                });
+            }
+
+            // Обработка принятия приглашения
+            $(document).on('click', '.accept-invitation', function() {
+                const invitationId = $(this).data('id');
+
+                $.ajax({
+                    url: '/messi/respond_invitation',
+                    type: 'POST',
+                    data: {
+                        id: invitationId,
+                        action: 'accepted'
+                    },
+                    success: function(response) {
+                        showNotification('Успех', response.message);
+                        // Перенаправляем пользователя на страницу чата
+                        window.location.href = response.redirect_url;
+                    },
+                    error: function(xhr) {
+                        let errorMsg = 'Произошла ошибка';
+                        if (xhr.responseJSON && xhr.responseJSON.error) {
+                            errorMsg = xhr.responseJSON.error;
+                        }
+                        showNotification('Ошибка', errorMsg);
+                    }
+                });
+            });
+
+            // Обработка отклонения приглашения
+            $(document).on('click', '.decline-invitation', function() {
+                const invitationId = $(this).data('id');
+
+                $.ajax({
+                    url: '/messi/respond_invitation',
+                    type: 'POST',
+                    data: {
+                        id: invitationId,
+                        action: 'declined'
+                    },
+                    success: function(response) {
+                        showNotification('Успех', response.message);
+                        // Перенаправляем пользователя на страницу меню чатов
+                        window.location.href = response.redirect_url;
+                    },
+                    error: function(xhr) {
+                        let errorMsg = 'Произошла ошибка';
+                        if (xhr.responseJSON && xhr.responseJSON.error) {
+                            errorMsg = xhr.responseJSON.error;
+                        }
+                        showNotification('Ошибка', errorMsg);
+                    }
+                });
+            });
+
+            // Устанавливаем соединение WebSocket для уведомлений (если реализовано)
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            const wsUrl = `${wsProtocol}://${window.location.host}/messi/ws`;
+            const notifSocket = new WebSocket(wsUrl);
+
+            notifSocket.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'notification') {
+                        const notification = data.notification;
+                        if (notification.type === 'invitation_sent') {
+                            showNotification('Новое приглашение', `Вы получили приглашение от ${notification.sender} в комнату "${notification.chat_name}" (ID: ${notification.chat_id})`);
+                            loadInvitations(); // Перезагружаем приглашения
+                        } else if (notification.type === 'invitation_accepted') {
+                            showNotification('Приглашение принято', `${notification.sender} принял ваше приглашение в комнату "${notification.chat_name}" (ID: ${notification.chat_id})`);
+                        } else if (notification.type === 'invitation_declined') {
+                            showNotification('Приглашение отклонено', `${notification.sender} отклонил ваше приглашение в комнату "${notification.chat_name}" (ID: ${notification.chat_id})`);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error parsing WebSocket notification message:', error);
+                }
+            };
+
+            notifSocket.onopen = function() {
+                console.log('Notifications WebSocket connection established');
+            };
+
+            notifSocket.onclose = function() {
+                console.log('Notifications WebSocket connection closed');
+            };
+
+            // Функция для отображения уведомлений с помощью Bootstrap Toasts
+            function showNotification(title, message) {
+                const notificationContainer = $('#notification-container');
+
+                const toastId = `toast-${Date.now()}`;
+
+                const toastHTML = `
+                    <div class="toast" id="${toastId}" role="alert" aria-live="assertive" aria-atomic="true" data-delay="5000">
+                        <div class="toast-header">
+                            <strong class="mr-auto">${title}</strong>
+                            <small class="text-muted">только что</small>
+                            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Закрыть">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                    </div>
+                `;
+
+                notificationContainer.append(toastHTML);
+                $(`#${toastId}`).toast('show');
+
+                // Удаляем уведомление из DOM после его скрытия
+                $(`#${toastId}`).on('hidden.bs.toast', function () {
+                    $(this).remove();
+                });
+            }
+
+            // Загрузка приглашений при загрузке страницы
+            loadInvitations();
+        });
+    </script>
+</body>
+</html>

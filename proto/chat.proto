@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package chat;
+
+option go_package = "proto/chatpb;chatpb";
+
+// Определение сервиса ChatService
+
+service ChatService {
+    rpc CreateRoom(CreateRoomRequest) returns (CreateRoomResponse);
+    rpc CloseRoom(CloseRoomRequest) returns (CloseRoomResponse);
+    rpc JoinRoom(JoinRoomRequest) returns (JoinRoomResponse);
+    rpc LeaveRoom(LeaveRoomRequest) returns (LeaveRoomResponse);
+    rpc SendPublicKey(SendPublicKeyRequest) returns (SendPublicKeyResponse);
+    rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+    rpc ReceiveMessages(ReceiveMessagesRequest) returns (stream ReceiveMessagesResponse);
+    rpc GetRoom(GetRoomRequest) returns (GetRoomResponse);
+    rpc GetRoomHistory(GetRoomHistoryRequest) returns (GetRoomHistoryResponse);
+    rpc GetPublicKeys(GetPublicKeysRequest) returns (GetPublicKeysResponse); // Метод для получения публичных ключей
+}
+
+message ClientPublicKey {
+    string client_id = 1;
+    string public_key = 2; // Публичный ключ клиента в формате hex
+}
+
+message GetPublicKeysRequest {
+    string room_id = 1;
+}
+
+message GetPublicKeysResponse {
+    repeated ClientPublicKey public_keys = 1; // Список публичных ключей всех клиентов в комнате
+}
+
+message CreateRoomRequest {
+    string algorithm = 1; // "rc5"
+    string mode = 2;      // "ECB", "CBC", "CFB", "OFB", "CTR", "RandomDelta"
+    string padding = 3;   // "Zeros", "ANSIX923", "PKCS7", "ISO10126"
+    string prime = 4;     // Простое число в формате hex
+}
+
+message CreateRoomResponse {
+    string room_id = 1;
+}
+
+message CloseRoomRequest {
+    string room_id = 1;
+}
+
+message CloseRoomResponse {
+    bool success = 1;
+}
+
+message JoinRoomRequest {
+    string room_id = 1;
+    string client_id = 2;
+}
+
+message JoinRoomResponse {
+    bool success = 1;
+    string error = 2; // Опционально: сообщение об ошибке
+}
+
+message LeaveRoomRequest {
+    string room_id = 1;
+    string client_id = 2;
+}
+
+message LeaveRoomResponse {
+    bool success = 1;
+    string error = 2; // Опционально: сообщение об ошибке
+}
+
+message SendPublicKeyRequest {
+    string room_id = 1;
+    string client_id = 2;
+    string public_key = 3; // Публичный ключ клиента в формате hex
+}
+
+message SendPublicKeyResponse {
+    bool success = 1;
+    string error = 2; // Опционально: сообщение об ошибке
+}
+
+message SendMessageRequest {
+    string room_id = 1;
+    string client_id = 2;
+    bytes encrypted_message = 3;
+    string message_type = 4; // "message" или "file"
+    string file_name = 5;    // Имя файла (только для файловых сообщений)
+}
+
+message SendMessageResponse {
+    bool success = 1;
+    string error = 2; // Опционально: сообщение об ошибке
+}
+
+message ReceiveMessagesRequest {
+    string room_id = 1;
+    string client_id = 2;
+}
+
+message ReceiveMessagesResponse {
+    string type = 1; // "public_key" или "message"
+    string sender_id = 2;
+    bytes encrypted_message = 3;
+    string file_name = 4; // Только для файлов
+    int32 chunk_index = 5; // Номер фрагмента (только для файлов)
+    int32 total_chunks = 6; // Общее количество фрагментов (только для файлов)
+}
+
+message GetRoomRequest {
+    string room_id = 1; // ID комнаты для получения параметров
+}
+
+message GetRoomResponse {
+    string algorithm = 1; // Алгоритм шифрования ("rc5")
+    string mode = 2;      // Режим шифрования ("ECB", "CBC", "CFB", "OFB", "CTR", "RandomDelta")
+    string padding = 3;   // Режим набивки ("Zeros", "ANSIX923", "PKCS7", "ISO10126")
+    string prime = 4;     // Простое число в формате hex
+}
+
+message GetRoomHistoryRequest {
+    string room_id = 1;
+    // Опционально: параметры пагинации
+    // int32 limit = 2;
+    // int32 offset = 3;
+}
+
+message MessageRecord {
+    string sender_id = 1;
+    bytes encrypted_message = 2;
+    string created_at = 3;
+}
+
+message GetRoomHistoryResponse {
+    repeated MessageRecord messages = 1;
+}
