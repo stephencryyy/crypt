@@ -16,6 +16,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/stephencryyy/crypt/algorithm"
+	"github.com/stephencryyy/crypt/algorithm/camellia"
 )
 
 // SECRET_KEY используется для шифрования приватных ключей пользователей.
@@ -127,15 +128,23 @@ func InitCipher(hashedSharedKey []byte, algorithmName, mode, padding string) *al
 
 	// Инициализация выбранного алгоритма
 	var symmetricAlgorithm algorithm.SymmetricAlgorithm
+	var err error
 	switch algorithmName {
 	case "rc5":
 		symmetricAlgorithm = algorithm.NewRC5()
+		err := symmetricAlgorithm.SetKey(finalKey)
+		if err != nil {
+			log.Fatalf("Ошибка при установке ключа: %v", err)
+		}
+	case "camellia":
+		symmetricAlgorithm, err = camellia.NewCamelliaCipher(finalKey)
+		if err != nil {
+			log.Fatalf("Ошибка при установке ключа: %v", err)
+		}
 	default:
 		log.Fatalf("Неизвестный алгоритм: %s", algorithmName)
 	}
 
-	// Установка ключа для выбранного алгоритма
-	err := symmetricAlgorithm.SetKey(finalKey)
 	if err != nil {
 		log.Fatalf("Ошибка при установке ключа: %v", err)
 	}

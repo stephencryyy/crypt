@@ -503,20 +503,25 @@ func initCipher(hashedSharedKey []byte, cipherContext **algorithm.CryptoSymmetri
 
 	// Инициализируем выбранный алгоритм
 	var symmetricAlgorithm algorithm.SymmetricAlgorithm
+	var err error
 	if algorithmName == "rc5" {
 		symmetricAlgorithm = algorithm.NewRC5()
+		// Установка ключа для выбранного алгоритма
+		err := symmetricAlgorithm.SetKey(finalKey)
+		if err != nil {
+			log.Fatalf("Ошибка при установке ключа: %v", err)
+		}
+
 	} else if algorithmName == "camellia" {
-		symmetricAlgorithm = camellia.NewCipher()
+		symmetricAlgorithm, err = camellia.NewCamelliaCipher(finalKey)
+		if err != nil {
+			log.Fatalf("Ошибка при установке ключа: %v", err)
+		}
 	} else {
 		log.Fatalf("Неизвестный алгоритм: %s", algorithmName)
 	}
 
-	// Установка ключа для выбранного алгоритма
-	err := symmetricAlgorithm.SetKey(finalKey)
-	if err != nil {
-		log.Fatalf("Ошибка при установке ключа: %v", err)
-	}
-
+	
 	// Преобразование режима шифрования и режима набивки
 	cipherMode := algorithm.CipherMode(algorithm.CBC) // По умолчанию
 	switch mode {

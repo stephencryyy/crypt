@@ -4,7 +4,8 @@ package camellia
 import (
 	"crypto/cipher"
 	"errors"
-	
+	"fmt"
+
 )
 
 // BlockSize is the block size of the camellia block cipher in bytes.
@@ -12,21 +13,46 @@ const BlockSize = 16
 
 var errKeySize = errors.New("invalid key size")
 
+// CamelliaCipher обёртка для реализации интерфейса SymmetricAlgorithm
+type CamelliaCipher struct {
+	block cipher.Block
+}
+
+func (c *CamelliaCipher) SetKey(key []byte) error {
+    block, err := NewCipher(key)
+    if err != nil {
+        return err
+    }
+    c.block = block
+    return nil
+}
+
+// NewCamelliaCipher создаёт новый CamelliaCipher с заданным ключом
+func NewCamelliaCipher(key []byte) (*CamelliaCipher, error) {
+	block, err := NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	return &CamelliaCipher{block: block}, nil
+}
+
+
 // NewCipher returns a new cipher.Block implementing the camellia cipher.
 // The key argument must be 128, 192 or 256 bit (16, 24, 32 byte).
 func NewCipher(key []byte) (cipher.Block, error) {
 	k := len(key)
-	if k == 16 {
+	switch k {
+	case 16:
 		c := new(blockCipher128)
 		c.keySchedule(key)
 		return c, nil
-	}
-	if k == 24 || k == 32 {
+	case 24, 32:
 		c := new(blockCipher256)
 		c.keySchedule(key)
 		return c, nil
+	default:
+		return nil, errKeySize
 	}
-	return nil, errKeySize
 }
 
 // The camellia cipher for 128 bit keys.
@@ -112,6 +138,8 @@ func (c *blockCipher128) Encrypt(dst, src []byte) {
 	dst[13] = byte(r1 >> 16)
 	dst[14] = byte(r1 >> 8)
 	dst[15] = byte(r1)
+
+	
 }
 
 func (c *blockCipher128) Decrypt(dst, src []byte) {
@@ -513,4 +541,39 @@ func (c *blockCipher256) keySchedule(key []byte) {
 	k[44], k[45], k[46], k[47] = s1, s2, s3, s0
 	rotl128(&s2, &s3, &s0, &s1, 2) // KL <<<111
 	k[60], k[61], k[62], k[63] = s2, s3, s0, s1
+}
+
+func (c *CamelliaCipher) Encrypt(data []byte) ([]byte, error) {
+    blockSize := c.block.BlockSize()
+
+    // Проверка, что длина данных кратна размеру блока
+    if len(data)%blockSize != 0 {
+        return nil, fmt.Errorf("длина данных (%d) не кратна размеру блока (%d)", len(data), blockSize)
+    }
+
+    encrypted := make([]byte, len(data))
+
+    for i := 0; i < len(data); i += blockSize {
+        c.block.Encrypt(encrypted[i:i+blockSize], data[i:i+blockSize])
+    }
+
+    return encrypted, nil
+}
+
+// Decrypt дешифрует данные и возвращает расшифрованный срез байтов.
+func (c *CamelliaCipher) Decrypt(data []byte) ([]byte, error) {
+    blockSize := c.block.BlockSize()
+
+    // Проверка, что длина данных кратна размеру блока
+    if len(data)%blockSize != 0 {
+        return nil, fmt.Errorf("длина данных (%d) не кратна размеру блока (%d)", len(data), blockSize)
+    }
+
+    decrypted := make([]byte, len(data))
+
+    for i := 0; i < len(data); i += blockSize {
+        c.block.Decrypt(decrypted[i:i+blockSize], data[i:i+blockSize])
+    }
+
+    return decrypted, nil
 }

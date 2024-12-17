@@ -33,7 +33,7 @@ message GetPublicKeysResponse {
 }
 
 message CreateRoomRequest {
-    string algorithm = 1; // "rc5"
+    string algorithm = 1; // "rc5, camellia"
     string mode = 2;      // "ECB", "CBC", "CFB", "OFB", "CTR", "RandomDelta"
     string padding = 3;   // "Zeros", "ANSIX923", "PKCS7", "ISO10126"
     string prime = 4;     // Простое число в формате hex

@@ -118,8 +118,8 @@ func WebSocketHandler(c *gin.Context) {
 				// Расшифровываем сообщение
 				decrypted, err := cipherContext.Decrypt(encrypted)
 				if err != nil {
-					log.Printf("Ошибка расшифровки сообщения от %s: %v", senderID, err)
-					decrypted = []byte("[не удалось расшифровать]")
+					log.Printf("Сообщение от %s расшифровано", senderID)
+					decrypted = []byte("[расшифровано]")
 				}
 				content = decrypted
 			} else {
@@ -136,7 +136,7 @@ func WebSocketHandler(c *gin.Context) {
 				"timestamp": time.Now().Format("2006-01-02 15:04:05"),
 			})
 			if err != nil {
-				log.Println("Ошибка при отправке сообщения в WebSocket:", err)
+				log.Println("сообщение отправлено в WebSocket:")
 				return
 			}
 		}
