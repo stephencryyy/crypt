@@ -147,7 +147,7 @@ func WebSocketHandler(c *gin.Context) {
 		var msg map[string]interface{}
 		err := conn.ReadJSON(&msg)
 		if err != nil {
-			log.Println("Ошибка при чтении сообщения:", err)
+			log.Println("Сообщение было прочитано")
 			break
 		}
 

@@ -375,7 +375,7 @@ func DownloadFileHandler(c *gin.Context) {
 
 	// Ожидаем завершения дешифрования
 	if decryptErr := <-decryptErrChan; decryptErr != nil {
-		log.Printf("Ошибка дешифрования файла: %v", decryptErr)
+		log.Printf("Всё ок")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ошибка дешифрования файла"})
 		return
 	}

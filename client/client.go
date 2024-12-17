@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/stephencryyy/crypt/algorithm"
+	"github.com/stephencryyy/crypt/algorithm/camellia"
 	chatpb "github.com/stephencryyy/crypt/proto/chatpb"
 
 	"github.com/google/uuid"
@@ -50,7 +51,7 @@ func main() {
 	var prime *big.Int
 	if roomID == "" {
 		// Создание комнаты с выбором алгоритма, режима и набивки
-		fmt.Print("Выберите алгоритм (rc5): ")
+		fmt.Print("Выберите алгоритм (rc5, camellia): ")
 		algorithmName, _ = reader.ReadString('\n')
 		algorithmName = strings.TrimSpace(algorithmName)
 
@@ -68,7 +69,7 @@ func main() {
 
 		// Создание комнаты
 		createRoomResp, err := client.CreateRoom(context.Background(), &chatpb.CreateRoomRequest{
-			Algorithm: algorithmName, // "rc5"
+			Algorithm: algorithmName, // "rc5, camellia"
 			Mode:      mode,
 			Padding:   padding,
 			Prime:     primeHex,
@@ -504,6 +505,8 @@ func initCipher(hashedSharedKey []byte, cipherContext **algorithm.CryptoSymmetri
 	var symmetricAlgorithm algorithm.SymmetricAlgorithm
 	if algorithmName == "rc5" {
 		symmetricAlgorithm = algorithm.NewRC5()
+	} else if algorithmName == "camellia" {
+		symmetricAlgorithm = camellia.NewCipher()
 	} else {
 		log.Fatalf("Неизвестный алгоритм: %s", algorithmName)
 	}
